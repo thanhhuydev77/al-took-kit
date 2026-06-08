@@ -1,0 +1,49 @@
+{
+  "name": "al-toolkit-adv",
+  "displayName": "AL Toolkit",
+  "description": "some additional tools for AL",
+  "publisher": "HaThanhHuy",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.120.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./src/extension.js",
+  "contributes": {
+    "commands": [{
+      "command": "altoolkit.clearanddownloadsymbol",
+      "title": "AL: Clear & Download Symbols "
+    }],
+   "configuration": {
+      "title": "Delete AL Packages Configuration",
+      "properties": {
+        "al.packageFolder": {
+          "type": "text",
+          "items": {
+            "type": "string"
+          },
+          "default": 
+            ".alpackages"
+          ,
+          "markdownDescription": "An array of relative paths to the folders containing `.alpackage` files. Leave empty to search the **entire** workspace."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.120.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "eslint": "^9.39.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
