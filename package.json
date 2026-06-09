@@ -1,12 +1,13 @@
 {
-  "name": "al-toolkit-adv",
-  "displayName": "AL Toolkit",
+  "name": "al-toolkit-x",
+  "displayName": "AL Toolkit X",
   "description": "some additional tools for AL",
   "publisher": "HaThanhHuy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "vscode": "^1.120.0"
   },
+   "icon": "logo.png",
   "categories": [
     "Other"
   ],
@@ -14,7 +15,7 @@
   "main": "./src/extension.js",
   "contributes": {
     "commands": [{
-      "command": "altoolkit.clearanddownloadsymbol",
+      "command": "altoolkit.redownloadsymbol",
       "title": "AL: Clear & Download Symbols "
     }],
    "configuration": {

@@ -4,7 +4,7 @@ const vscode = require('vscode');
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-    let disposable = vscode.commands.registerCommand('altoolkit.clearanddownloadsymbol', async () => {
+    let disposable = vscode.commands.registerCommand('altoolkit.redownloadsymbol', async () => {
         
         // 1. Check if a workspace folder is open
         if (!vscode.workspace.workspaceFolders) {
@@ -14,23 +14,45 @@ function activate(context) {
 
         // 2. Fetch the target folder configuration
         const config = vscode.workspace.getConfiguration('');
-        let targetFolder = config.get('al.packageCachePath', '').trim();
+        let packageCachePath = config.get('al.packageCachePath');
 
-        // 3. Build the search pattern dynamically
-        let filePattern = '**/*.app';
-        if (targetFolder !== '') {
-            targetFolder = targetFolder.replace(/^\/+|\/+$/g, '');
-            filePattern = `${targetFolder}/**/*.app`;
+        // Normalize setting to an array of folders
+        let targetFolders = [];
+        if (Array.isArray(packageCachePath)) {
+            targetFolders = packageCachePath.filter(p => typeof p === 'string' && p.trim() !== '');
+        } else if (typeof packageCachePath === 'string' && packageCachePath.trim() !== '') {
+            targetFolders = [packageCachePath.trim()];
         }
 
-        // 4. Find all matching files
-        const files = await vscode.workspace.findFiles(filePattern);
+        // 3. Build the search patterns dynamically and 4. Find all matching files
+        let files = [];
+        if (targetFolders.length === 0) {
+            files = await vscode.workspace.findFiles('**/*.app');
+        } else {
+            for (let folder of targetFolders) {
+                folder = folder.trim();
+                if (folder.startsWith('./')) {
+                    folder = folder.substring(2);
+                }
+                folder = folder.replace(/^\/+|\/+$/g, '');
+                
+                const filePattern = folder !== '' ? `${folder}/**/*.app` : '**/*.app';
+                const matchedFiles = await vscode.workspace.findFiles(filePattern);
+                
+                // Add files and avoid duplicates if patterns overlap
+                for (const match of matchedFiles) {
+                    if (!files.some(f => f.fsPath === match.fsPath)) {
+                        files.push(match);
+                    }
+                }
+            }
+        }
 
         if (files.length === 0) {
         } else {
 
         // 5. Confirmation dialog
-        const folderNotice = targetFolder ? ` inside "${targetFolder}"` : '';
+        const folderNotice = targetFolders.length > 0 ? ` inside "${targetFolders.join(', ')}"` : '';
         const confirm = await vscode.window.showWarningMessage(
             `Are you sure you want to delete all ${files.length} .app file(s)${folderNotice}?`,
             { modal: true },
